@@ -1,0 +1,20 @@
+<html xmlns:th="http://www.thymeleaf.org" >
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<form th:object="${penalty}" method="post" th:action>
+<select th:field="*{code}" class="form-select" th:errorclass="field-error">
+  <option value="">카테고리선택</option>
+  <option th:each="reportvalue :${reportValues}" th:value="${reportvalue.getCode()}"
+          th:text="${reportvalue.getDisplayName()}"></option>
+</select>
+  제목 : <input type="text" th:field="*{title}">
+  내용 : <input type="text" th:field="*{content}">
+  <button type="submit">신고하기</button>
+</form>
+</select>
+
+</body>
+</html>

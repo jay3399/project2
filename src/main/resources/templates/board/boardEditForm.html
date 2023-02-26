@@ -1,0 +1,35 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<form th:object="${board}" method="post" th:action enctype="multipart/form-data">
+  <div>
+    <select th:field="*{categoryCode}" class="form-select" th:errorclass="field-error">
+      <option value="">카테고리선택</option>
+      <option th:each="categoryValue :${categoryValues}" th:value="${categoryValue.getCode()}"
+              th:text="${categoryValue.getDisplayName()}"></option>
+    </select>
+    <input th:field="*{title}" type="text" th:errorclass="field-error">
+    <div class="field-error" th:errors="*{title}"></div>
+  </div>
+  <p></p>
+  <div>
+    <input class="input-content" th:field="*{content}" type="text" th:errorclass="field-error">
+    <div class="field-error" th:errors="*{content}"></div>
+  </div>
+
+  <div>
+    <input th:field="*{files}" type="file" multiple>
+    <img th:each="imageFile : ${orFiles}"
+         th:src="@{/imagePath/{imageFile}(imageFile=${imageFile.storedFilename})}"
+         width="200" height="200"
+    >
+<!--    <input th:field="*{generalFiles}" type="file" multiple>-->
+  </div>
+  <button type="submit">제출하기</button>
+</form>
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+<head>
+  <meta charset="utf-8">
+  <link th:href="@{/css/bootstrap.min.css}"
+        href="css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div sec:authorize="isAuthenticated()" class="container" style="max-width: 600px">
+  <div class="row" sec:authorize="hasAnyRole('ROLE_USER' , 'ROLE_PENALTY')">
+    <div class="py-5 text-center">
+      <h2>사용자 메뉴</h2>
+    </div>
+    <hr class="my-4">
+    <h4 class="mb-3"  sec:authentication="name" ></h4><span>님 안녕하세요</span>
+    <div class="col">
+      <button class="w-100 btn btn-secondary btn-lg" type="button"
+              th:onclick="|location.href='@{/boards/ALL/category}'|">
+        게시판
+      </button>
+    </div>
+    <div class="col">
+      <button class="w-100 btn btn-secondary btn-lg" type="button"
+              th:onclick="|location.href='@{/myPage}'|">
+        마이페이지
+      </button>
+    </div>
+    <div class="col">
+      <form th:action="@{/logout}" method="post">
+        <button class="w-100 btn btn-dark btn-lg" type="submit">
+          로그아웃
+        </button>
+      </form>
+    </div>
+  </div>
+  <div class="row" sec:authorize="hasAnyRole('ROLE_ADMIN')">
+    <div class="py-5 text-center">
+      <h2>관리자 메뉴</h2>
+    </div>
+    <div class="col">
+      <button class="w-100 btn btn-secondary btn-lg" type="button"
+              th:onclick="|location.href='@{/admin/members}'|">
+        회원관리
+      </button>
+    </div>
+    <div class="col">
+      <button class="w-100 btn btn-secondary btn-lg" type="button"
+              th:onclick="|location.href='@{/admin/boards/id/sort}'|">
+        게시판관리
+      </button>
+    </div>
+    <div class="col">
+      <form th:action="@{/logout}" method="post">
+        <button class="w-100 btn btn-dark btn-lg" type="submit">
+          로그아웃
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+  <div sec:authorize="!isAuthenticated()"class ="container" style="max-width : 600px">
+    <div class="py-5 text-center">
+      <h2>홈화면</h2>
+    </div>
+    <hr class="my-4">
+
+    <div class="row">
+      <div class="col">
+        <button class="w-100 btn btn-secondary btn-lg" type="button"
+                th:onclick="|location.href='@{/members/signUp}'|">
+          회원가입
+        </button>
+      </div>
+      <div class="col">
+        <button class="w-100 btn btn-dark btn-lg"
+                onclick="location.href='items.html'"
+                th:onclick="|location.href='@{/login}'|" type="button">
+          로그인
+        </button>
+      </div>
+    </div>
+  </div>
+
+<!-- /container -->
+</body>
+</html>

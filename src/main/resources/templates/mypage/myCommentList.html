@@ -1,0 +1,32 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link th:href="@{/css/bootstrap.min.css}"
+        href="../css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<table class="list-group-item-action">
+  <thead>
+  <tr>
+    <th>번호</th>
+    <th>내용</th>
+    <th>작성일</th>
+    <th>게시판번호</th>
+    <th>좋아요</th>
+    <th>싫어요</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="comment: ${boardComments}">
+    <td th:text="${comment.id}"></td>
+    <td th:text="${comment.content}"></a></td>
+    <td th:text="${#temporals.format(comment.createdDate , 'yyyy-MM-dd HH:mm:ss')}"></td>
+    <td th:text="${comment.boardNum}"></td>
+    <td th:text="${comment.likeNum}"></td>
+    <td th:text="${comment.disLikeNum}"></td>
+  </tr>
+  </tbody>
+</table>
+</body>
+</html>

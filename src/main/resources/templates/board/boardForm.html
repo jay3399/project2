@@ -1,0 +1,97 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+
+
+    .container {
+      max-width: 560px;
+    }
+
+    .field-error {
+      border-color: #e0707b;
+      color: #dc3545;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .input-content {
+      width: 488px;
+      height: 400px;
+    }
+
+  </style>
+</head>
+<body>
+<article>
+  <div>
+    <form th:action="@{/boards/post}" th:object="${boardForm}" method="post"
+          enctype="multipart/form-data">
+      <div>
+        <select th:field="*{categoryCode}" class="form-select" th:errorclass="field-error">
+        <option value="">카테고리선택</option>
+        <option sec:authorize="hasAnyRole('ROLE_ADMIN')" value="NOTICE">공지사항</option>
+        <option th:each="categoryValue :${categoryValues}" th:value="${categoryValue.getCode()}"
+                th:text="${categoryValue.getDisplayName()}"></option>
+
+      </select>
+      <input th:field="*{title}" type="text" th:errorclass="field-error">
+      <div class="field-error" th:errors="*{title}"></div>
+      </div>
+      <p></p>
+      <div>
+      <input class="input-content" th:field="*{content}" type="text" th:errorclass="field-error">
+      <div class="field-error" th:errors="*{content}"></div>
+      </div>
+
+      <div>
+      <input th:field="*{imageFiles}" type="file" multiple>
+      <input th:field="*{generalFiles}" type="file" multiple>
+      </div>
+      <button type="submit">제출하기</button>
+    </form>
+
+
+  </div>
+
+</article>
+</body>
+<script>
+
+  //  $("#duplicated").click(
+  //      () => {
+  //        $("#signup").attr("type", "button");
+  //        const id = $("#userId").val();
+  //        $.ajax(
+  //            {
+  //              type: "POST",
+  //              url: "/members/signUp/duplicateCheck",
+  //              data: {
+  //                userId : id
+  //              },
+  //              success: function (data) {
+  //                if (data) alert("이미사용중인 아이디입니다.");
+  //                if (!data) {
+  //                  alert("사용가능한 아이디입니다");
+  //                  $("#signup").attr("type", "submit");
+  //                }
+  //              }
+  //            }
+  //
+  //        )
+  //      }
+  //  )
+
+
+</script>
+
+
+</html>
+</html>

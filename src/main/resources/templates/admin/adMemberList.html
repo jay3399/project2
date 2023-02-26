@@ -1,0 +1,52 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <style>
+    body{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+  <link th:href="@{/css/bootstrap.min.css}"
+        href="../css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+  <div>
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>번호</th>
+        <th>아이디</th>
+        <th>닉네임</th>
+        <th>게시글수</th>
+        <th>댓글수</th>
+        <th>가입일</th>
+        <th>폰번호</th>
+        <th>이메일</th>
+        <th>상태</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="member : ${members}">
+        <td th:text="${member.id}"></td>
+        <td th:text="${member.userId}"></td>
+        <td th:text="${member.nickname}"></td>
+        <td th:text="${member.countOfBoards}"></td>
+        <td th:text="${member.countOfComments}"></td>
+        <td th:text="${#temporals.format(member.createdDate , 'yyyy-MM-dd')}"></td>
+        <td th:text="${member.phoneNumber}"></td>
+        <td th:text="${member.email}"></td>
+        <td th:text="${member.role}"></td>
+        <!--        <td>-->
+        <!--          <a href="#" th:href="@{/items/{id}/edit (id=${item.id})}"-->
+        <!--             class="btn btn-primary" role="button">수정</a>-->
+        <!--        </td>-->
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div> <!-- /container -->
+</body>
+</html>

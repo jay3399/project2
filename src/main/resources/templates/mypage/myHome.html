@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link th:href="@{/css/bootstrap.min.css}"
+        href="css/bootstrap.min.css" rel="stylesheet">
+  <title>Title</title>
+</head>
+<body>
+<div class="col">
+  <button class="w-100 btn btn-secondary btn-lg" type="button"
+          th:onclick="|location.href='@{/myPage/info}'|">
+    가입정보
+  </button>
+</div>
+<div class="col">
+  <button class="w-100 btn btn-secondary btn-lg" type="button"
+          th:onclick="|location.href='@{/myPage/myBoardList}'|">
+    등록게시글
+  </button>
+</div>
+<div class="col">
+  <button class="w-100 btn btn-secondary btn-lg" type="button"
+          th:onclick="|location.href='@{/myPage/myComments}'|">
+    등록댓글
+  </button>
+</div>
+
+</body>
+</html>

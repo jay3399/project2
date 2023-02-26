@@ -1,0 +1,13 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+아이디 : <span th:text="${member.userId}"></span>
+닉네임 : <span th:text="${member.nickname}"></span>
+이메일 : <span th:text="${member.email}"></span>
+핸드폰번호 : <span th:text="${member.phoneNumber}"></span>
+  <button>수정하기</button> <button>비밀번호변경</button>
+</body>
+</html>

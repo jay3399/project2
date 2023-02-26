@@ -1,0 +1,180 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <style>
+
+
+
+
+  body{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /*.image-title {*/
+  /*  text-decoration-line: none;*/
+  /*}*/
+
+  a:link{
+    text-decoration-line: none;
+    color: black;
+  }
+  a:visited{
+    text-decoration-line: none;
+    color: #084298;
+  }
+
+  ul{
+    display: flex;
+    list-style: none;
+  }
+
+
+  .notice {
+    background-color: rgba(185, 255, 228, 0.25);
+    font-weight: 550;
+
+
+  }
+
+  </style>
+
+  <link th:href="@{/css/bootstrap.min.css}"
+        href="css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body vlink="#6495ed">
+<div class="container">
+  <nav
+      th:with="
+                pageNumber = ${pageList.pageable.pageNumber},
+                pageSize = ${pageList.pageable.pageSize},
+                totalPages = ${pageList.totalPages},
+                startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
+                tempEndPage = ${startPage + pageSize - 1},
+                endPage = (${tempEndPage < totalPages ? tempEndPage : totalPages})"
+      aria-label="Page navigation"
+  >
+  <div>
+    <a th:href="@{/boards/ALL/category}">전체글|</a>
+    <th:block th:each="category : ${categoryValues}">
+      <a th:href="@{/boards/{categoryCode}/category (categoryCode=${category.code})}" th:text="${category.displayName}">잡담</a>
+    </th:block>
+  </div>
+  <div>
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th th:text="#{board.id}">번호</th>
+        <th th:text="#{board.code}">분류</th>
+        <th th:text="#{board.title}">제목</th>
+        <th th:text="#{board.create}">글쓴이</th>
+        <th th:text="#{board.date}">작성일</th>
+        <th th:text="#{board.count}">조회수</th>
+        <th th:text="#{board.like}">추천수</th>
+        <th th:text="#{board.comments}">댓글수</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="board : ${pageList}" th:classappend=" ${board.categoryName == '공지사항'} ? 'notice'">
+        <th:block th:if="${!board.isDeleted}">
+        <td th:text="${board.id}"></td>
+        <td th:text="${board.categoryName}"></td>
+        <td>
+          <th:block th:if="${board.mainImage != null}">
+            <img th:src="@{/imagePath/{imageFile}(imageFile=${board.mainImage.storedFilename})}" width="30" height="30">
+          </th:block>
+          <th:block th:if="${board.mainImage == null}">
+            <img src="/imagePath/blank.png" width="30" height="30">
+          </th:block>
+          <a th:href="@{/boards/{boardId} (boardId=${board.id})}" th:text="${board.title}" class="image-title">제목</a>
+        </td>
+        <td th:text="${board.createBy}"></td>
+        <td th:text="${#temporals.format(board.localDateTime , 'yyyy-MM-dd HH:mm:ss')}"></td>
+        <td th:text="${board.countVisit}"></td>
+        <td th:text="${board.postLike}"></td>
+        <td th:text="${board.totalComments}"></td>
+        </th:block>
+      </tr>
+      </tbody>
+    </table>
+    <ul class="pagination ">
+      <!-- 처음으로 이동 -->
+      <li th:classappend="${pageNumber < pageSize} ? 'disabled'" class="page-item">
+        <a class="page-link" th:href="@{/boards/{categoryCode}/category (page=0 , categoryCode=${categoryV},title=${boardSearch.title}, content=${boardSearch.content} , nickname=${boardSearch.nickname})}">
+<!--          <span>&laquo;</span>-->
+          <span class="sr-only">처음</span>
+        </a>
+      </li>
+
+      <!-- 이전으로 이동 -->
+      <li th:classappend="${pageList.first} ? 'disabled'" class="page-item">
+        <a class="page-link" th:href="${pageList.first} ? '#' : @{/boards/{categoryCode}/category(page=${pageNumber - 1} , categoryCode=${categoryV} ,title=${boardSearch.title}, content=${boardSearch.content} , nickname=${boardSearch.nickname})}" aria-label="Previous">
+          <span aria-hidden="true">&lt;</span>
+          <span class="sr-only">이전</span>
+        </a>
+      </li>
+
+      <!-- 특정 페이지로 이동 -->
+      <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
+        <a th:text="${page}" class="page-link" th:href="@{/boards/{categoryCode}/category (page=${page - 1} , categoryCode=${categoryV} , title=${boardSearch.title}, content=${boardSearch.content} , nickname=${boardSearch.nickname})}"></a>
+      </li>
+
+      <!-- 다음으로 이동 -->
+      <li th:classappend="${pageList.last} ? 'disabled'" class="page-item">
+        <a class="page-link" th:href="${pageList.last} ? '#' : @{/boards/{categoryCode}/category (page=${pageNumber + 1} , categoryCode=${categoryV} , title=${boardSearch.title}, content=${boardSearch.content} , nickname=${boardSearch.nickname})}" aria-label="Next">
+          <span class="sr-only">다음</span>
+          <span aria-hidden="true">&gt;</span>
+        </a>
+      </li>
+
+      <!-- 마지막으로 이동 -->
+      <li th:classappend=" ${T(java.lang.Math).floor(totalPages / pageSize) * pageSize - 1 <= startPage} ? 'disabled'" class="page-item">
+      <a class="page-link" th:href="@{/boards/{categoryCode}/category (page=${pageList.totalPages - 1} , categoryCode=${categoryV} , title=${boardSearch.title}, content=${boardSearch.content} , nickname=${boardSearch.nickname})}">
+<!--          <span>&raquo;</span>-->
+          <span class="sr-only">마지막</span>
+        </a>
+      </li>
+    </ul>
+    </nav>
+  </div> <!-- /container -->
+  </div>
+  <div>
+    <form th:action="@{/boards/{categoryCode}/category (categoryCode=${categoryV})}" method="get">
+      <select id="selectValue" onchange="searchCondition()">
+        <option value="">검색</option>
+        <option value="title">제목</option>
+        <option value="content">내용</option>
+        <option value="complex">내용+제목</option>
+        <option value="nickname">닉네임</option>
+      </select>
+      <input type="text" id="search" value="">
+      <button type="submit">검색</button>
+    </form>
+  </div>
+  <div sec:authorize="hasAnyRole('ROLE_USER' , 'ROLE_ADMIN')">
+    <form th:action="@{/boards/post}" method="get">
+      <button type="submit" >글작성</button>
+    </form>
+  </div>
+</div> <!-- /container -->
+</body>
+<script>
+
+
+  function searchCondition(){
+    let langSelect = document.getElementById("selectValue");
+
+    let selectValue = langSelect.options[langSelect.selectedIndex].value;
+
+    let input = document.getElementById("search");
+
+    input.setAttribute("name", selectValue);
+
+  }
+
+
+
+
+</script>
+</html>

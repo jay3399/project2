@@ -1,0 +1,171 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script
+      src="https://code.jquery.com/jquery-3.6.1.min.js"
+      integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
+      crossorigin="anonymous">
+  </script>
+  <link th:href="@{/css/bootstrap.min.css}"
+        href="../css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body{
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    a:link{
+      text-decoration-line: none;
+      color: black;
+    }
+    a:visited{
+      text-decoration-line: none;
+      color: #084298;
+    }
+  </style>
+
+</head>
+<body>
+<nav
+    th:with="
+                pageNumber = ${pageList.pageable.pageNumber},
+                pageSize = ${pageList.pageable.pageSize},
+                totalPages = ${pageList.totalPages},
+                startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
+                tempEndPage = ${startPage + pageSize - 1},
+                endPage = (${tempEndPage < totalPages ? tempEndPage : totalPages})"
+    aria-label="Page navigation"
+>
+
+<select id="selectValue">
+  <option value="">내림차순정렬</option>
+  <option id="sortValue" th:each="sortValue : ${sortValues}" th:value="${sortValue.code}" th:text="${sortValue.displayName}"></option>
+</select>
+<button type="button" th:onclick="|javascript:arrange()|">정리하기</button>
+
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th th:text="#{board.id}">번호</th>
+    <th th:text="#{board.title}">제목</th>
+    <th th:text="#{board.create}">닉네임</th>
+    <th th:text="#{board.date}">작성일</th>
+    <th th:text="#{board.comments}">댓글수</th>
+    <th th:text="#{board.count}">조회수</th>
+    <th th:text="#{board.like}">추천</th>
+    <th th:text="#{board.report}">신고수</th>
+    <th>상태</th>
+    <th>삭제</th>
+  </tr>
+  </thead>
+  <form action="/admin/deleteBoard" method="get">
+  <tbody>
+  <tr th:each="board : ${pageList}">
+    <td th:text="${board.id}"></td>
+    <td>
+      <a th:href="@{/boards/{boardId} (boardId=${board.id})}" th:text="${board.title}"></a>
+    </td>
+    <td th:text="${board.nickname}"></td>
+    <td th:text="${#temporals.format(board.createDate , 'yyyy-MM-dd HH:mm:ss')}"></td>
+    <td th:text="${board.totalComments}"></td>
+    <td th:text="${board.viewCount}"></td>
+    <td th:text="${board.likeCount}"></td>
+    <td><a th:href="@{/admin/penalty/{boardId} (boardId=${board.id})}" th:text="${board.penaltyCount}"></a></td>
+    <td th:text="${!board.isDeleted} ? 'ACTIVE' : 'DELETED'"></td>
+    <td><input type="checkbox" id="delete" name="boardIdList" th:value="${board.id}" ></td>
+  </tr>
+  </tbody>
+    <button type="submit">삭제하기</button>
+  </form>
+</table>
+  <ul class="pagination ">
+    <!-- 처음으로 이동 -->
+    <li th:classappend="${pageNumber < pageSize} ? 'disabled'" class="page-item">
+      <a class="page-link" th:href="@{/admin/boards/{sortValue}/sort (page=0 , sortValue=${pageSortValue})}">
+        <!--          <span>&laquo;</span>-->
+        <span class="sr-only">처음</span>
+      </a>
+    </li>
+
+    <!-- 이전으로 이동 -->
+    <li th:classappend="${pageList.first} ? 'disabled'" class="page-item">
+      <a class="page-link" th:href="${pageList.first} ? '#' : @{/admin/boards/{sortValue}/sort (page=${pageNumber - 1} , sortValue=${pageSortValue})}" aria-label="Previous">
+        <span aria-hidden="true">&lt;</span>
+        <span class="sr-only">이전</span>
+      </a>
+    </li>
+
+    <!-- 특정 페이지로 이동 -->
+    <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
+      <a th:text="${page}" class="page-link" th:href="@{/admin/boards/{sortValue}/sort (page=${page - 1} , sortValue=${pageSortValue})}"></a>
+    </li>
+
+    <!-- 다음으로 이동 -->
+    <li th:classappend="${pageList.last} ? 'disabled'" class="page-item">
+      <a class="page-link" th:href="${pageList.last} ? '#' : @{/admin/boards/{sortValue}/sort (page=${pageNumber + 1} , sortValue=${pageSortValue})}" aria-label="Next">
+        <span class="sr-only">다음</span>
+        <span aria-hidden="true">&gt;</span>
+      </a>
+    </li>
+
+    <!-- 마지막으로 이동 -->
+    <li th:classappend=" ${T(java.lang.Math).floor(totalPages / pageSize) * pageSize - 1 <= startPage} ? 'disabled'" class="page-item">
+      <a class="page-link" th:href="@{/admin/boards/{sortValue}/sort (page=${pageList.totalPages - 1} , sortValue=${pageSortValue})}">
+        <!--          <span>&raquo;</span>-->
+        <span class="sr-only">마지막</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+<!--<th:block th:each="page:${#numbers.sequence(startPage , endPage)}">-->
+<!--<a th:if="${page != nowPage}" th:href="@{/admin/boards(page=${page-1})}" th:text="${page}"></a>-->
+<!--<strong th:if="${page==nowPage}" th:text="${page}" style="color: #0a53be"></strong>-->
+<!--</th:block>-->
+
+
+</body>
+<script th:inline="javascript">
+
+  function arrange() {
+    let formElement = document.createElement("form");
+
+    formElement.setAttribute("method", "get");
+    formElement.setAttribute("action" , "/admin/deleteAll")
+
+    document.body.appendChild(formElement);
+
+    formElement.submit();
+
+  }
+
+
+
+
+  $(document).on("change", "#selectValue", function () {
+    let value = $("#selectValue option:selected").val();
+
+    let htmlFormElement = document.createElement("form");
+
+    htmlFormElement.setAttribute("method", "get");
+    htmlFormElement.setAttribute("action", "/admin/boards/" + value +"/sort");
+
+    document.body.appendChild(htmlFormElement);
+
+    htmlFormElement.submit();
+
+  });
+
+
+
+
+
+
+
+
+
+
+</script>
+</html>

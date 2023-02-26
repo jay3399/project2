@@ -1,0 +1,33 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link th:href="@{/css/bootstrap.min.css}"
+        href="../css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th>번호</th>
+    <th>분류</th>
+    <th>내용</th>
+    <th>신고자</th>
+    <th>신고일</th>
+  </tr>
+  </thead>
+    <tbody>
+    <tr th:each="penalty : ${penalty}">
+      <td th:text="${penalty.id}"></td>
+      <td th:text="${penalty.code}"></td>
+      <td th:text="${penalty.content}"></td>
+      <td th:text="${penalty.userId}"></td>
+      <td th:text="${#temporals.format(penalty.created , 'yyyy-MM-dd HH:mm:ss')}"></td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+
+</html>
