@@ -5,6 +5,14 @@
   <meta charset="utf-8">
   <link th:href="@{/css/bootstrap.min.css}"
         href="css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  </style>
 </head>
 <body>
 <div sec:authorize="isAuthenticated()" class="container" style="max-width: 600px">
@@ -58,6 +66,26 @@
       </form>
     </div>
   </div>
+  <div class="row" sec:authorize="hasAnyRole('ROLE_HUMAN')">
+    <div class="py-5 text-center">
+      <h2>휴먼회원입니다 ,본인인증 부탁드립니다.</h2>
+    </div>
+    <div class="col">
+      <button class="w-100 btn btn-secondary btn-lg" type="button"
+              th:onclick="th:"
+
+      >
+          휴먼인증
+      </button>
+    </div>
+    <div class="col">
+      <form th:action="@{/logout}" method="post">
+        <button class="w-100 btn btn-dark btn-lg" type="submit">
+          로그아웃
+        </button>
+      </form>
+    </div>
+  </div>
 </div>
   <div sec:authorize="!isAuthenticated()"class ="container" style="max-width : 600px">
     <div class="py-5 text-center">
@@ -81,6 +109,11 @@
       </div>
     </div>
   </div>
+<div>
+<label for="visitPerDay" th:text="일일방문자수"></label><span id="visitPerDay" th:text="${visitPerDay}"></span>
+<br>
+<label for="totalVisit" th:text="전체방문자수"></label><span id="totalVisit" th:text="${totalVisit}"></span>
+</div>
 
 <!-- /container -->
 </body>

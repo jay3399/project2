@@ -1,27 +1,31 @@
 package Jay.BoardP.controller;
 
 
+import static org.springframework.util.StringUtils.hasText;
+
 import Jay.BoardP.controller.dto.MemberFormDto;
-import Jay.BoardP.domain.Address;
 import Jay.BoardP.domain.Member;
 import Jay.BoardP.service.EmailService;
 import Jay.BoardP.service.memberService;
+import java.time.Duration;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/members")
@@ -36,22 +40,19 @@ public class MemberController {
     @GetMapping("/signUp")
     public String addForm(@ModelAttribute("memberFormDto") MemberFormDto memberFormDto, Model model
     ) {
-
-        Address address = new Address(null, null, null);
-        model.addAttribute("address", address);
-
         return "members/createMemberform";
     }
 
 
     @PostMapping("/signUp")
-    public String addMember(@Validated @ModelAttribute("memberFormDto") MemberFormDto memberFormDto,
+    public String addMember(@Validated@ModelAttribute("memberFormDto") MemberFormDto memberFormDto,
         BindingResult bindingResult, HttpServletRequest request) {
 
-        System.out.println("memberFormDto = " + memberFormDto);
+//        HttpSession session1 = request.getSession();
+//        String code = (String) session1.getAttribute("email");
 
-        HttpSession session1 = request.getSession();
-        String code = (String) session1.getAttribute("email");
+        String code = String.valueOf(redisTemplate.opsForValue().get(memberFormDto.getEmail()));
+
 
         //비밀번호 재확인 검증
         if (!memberFormDto.getPassword().equals(memberFormDto.getCheckPassword())) {
@@ -70,12 +71,42 @@ public class MemberController {
         memberService.save(memberFormDto);
 
         makeUpdateCount();
+//
+//        HttpSession session = request.getSession();
+//        session.invalidate();
 
-        HttpSession session = request.getSession();
-        session.invalidate();
+        redisTemplate.delete(memberFormDto.getEmail());
 
         return "redirect:/";
     }
+
+    @GetMapping("/{id}/release")
+    public String releaseHumanForm(@PathVariable String id) {
+        return "members/validateMember";
+    }
+
+    @PostMapping("/{id}/release")
+    public String validateHuman(@PathVariable Long id, @RequestParam String password , RedirectAttributes redirectAttributes) {
+
+        if (!hasText(password)) {
+            redirectAttributes.addAttribute("empty", "비밀번호가 비어있습니다");
+            redirectAttributes.addAttribute("id", id);
+            return "redirect:/members/{id}/validate";
+        }
+
+        if (isValidatedHuman(id, password)) {
+            redirectAttributes.addAttribute("mismatch", "비밀번호가 잘못됐습니다");
+            redirectAttributes.addAttribute("id", id);
+            return "redirect:/members/{id}/validate";
+        }
+
+        return "redirect:/login";
+    }
+
+    private boolean isValidatedHuman(Long id, String password) {
+        return !memberService.findOne(id).getPassword().equals(password);
+    }
+
 
     @PostMapping("/signUp/mail")
     @ResponseBody
@@ -84,19 +115,22 @@ public class MemberController {
         boolean isDup = false;
 
         Member byEmail = memberService.findByEmail(email);
-        System.out.println("byEmail = " + byEmail);
-//
-//        if(!byEmail.isEmpty()) {
-//            return "1";
-//        }
-        if (byEmail != null) {
+
+        if (byEmail == null && !redisTemplate.hasKey(email)) {
+
+            String code = emailService.mailCheck(email);
+
+            redisTemplate.opsForValue().set(email, code, Duration.ofMinutes(3));
+
+            String.valueOf(redisTemplate.opsForValue().get(email));
+
+        } else {
             isDup = true;
         }
 
-        String code = emailService.mailCheck(email);
-
-        HttpSession session = request.getSession();
-        session.setAttribute("email", code);
+//
+//        HttpSession session = request.getSession();
+//        session.setAttribute("email", code);
 
         return isDup;
     }
@@ -108,9 +142,6 @@ public class MemberController {
         boolean isCheck = false;
 
         HttpSession session = request.getSession();
-
-        System.out.println("code = " + code);
-        System.out.println("session.getAttribute(\"email\") = " + session.getAttribute("email"));
 
         if (code.equals(session.getAttribute("email"))) {
             isCheck = true;

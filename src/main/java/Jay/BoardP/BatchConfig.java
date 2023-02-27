@@ -9,6 +9,8 @@ import Jay.BoardP.domain.TotalVisit;
 import Jay.BoardP.repository.CountPerDayRepository;
 import Jay.BoardP.repository.CountPerMonthRepository;
 import Jay.BoardP.repository.SpringDataCountRepository;
+import Jay.BoardP.repository.SpringDataTotalVisitRepository;
+import java.security.SecurityPermission;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -39,28 +41,25 @@ import org.springframework.data.redis.core.RedisTemplate;
 public class BatchConfig {
 
     private final JobBuilderFactory jobBuilderFactory;
-
     private final StepBuilderFactory stepBuilderFactory;
-
     private final EntityManagerFactory entityManagerFactory;
-
     private final RedisTemplate redisTemplate;
-
     private final SpringDataCountRepository repository;
-
+    private final SpringDataTotalVisitRepository totalVisitRepository;
     private final CountPerDayRepository countPerDayRepository;
     private final CountPerMonthRepository countPerMonthRepository;
 
 
     @Bean
     public Job jobPerDay() {
-        return jobBuilderFactory.get("job").preventRestart().start(stepForPenalty())
+        return jobBuilderFactory.get("jobPerDay").preventRestart().start(stepForPenalty())
+            .next(stepForTotalVisit())
             .next(stepForCountPerDay()).build();
     }
 
     @Bean
     public Job jobPerMonth() {
-        return jobBuilderFactory.get("jobPerMonth").start(stepForHumanOnMember())
+        return jobBuilderFactory.get("jobPerMonth").preventRestart().start(stepForHumanOnMember())
             .next(stepForHumanOnBoard()).next(
                 stepForCountPerMonth()).build();
     }
@@ -198,25 +197,6 @@ public class BatchConfig {
         };
     }
 
-//    // 월별데이터 업데이트
-////    @Bean
-//    public ItemProcessor<CountPerDay , CountPerMonth> chunkProcessor3() {
-//        return new ItemProcessor<CountPerDay, CountPerMonth>() {
-//
-////            CountPerMonth countPerMonth = new CountPerMonth();
-//
-//            @Override
-//            public CountPerMonth process(CountPerDay item) throws Exception {
-//                countPerMonth.addVisitPerMonth(item);
-//                return countPerMonth;
-//            }
-//
-//
-//        };
-//
-//
-//    }
-
 
     //    @Bean
     public ItemWriter<Member> jpaCursorItemWriter() {
@@ -294,6 +274,32 @@ public class BatchConfig {
     }
 
 
+    public Step stepForTotalVisit() {
+        return stepBuilderFactory.get("stepForTotalVisit")
+            .tasklet(
+                ((contribution, chunkContext) -> {
+
+                    if (!redisTemplate.hasKey("VisitCountPerDay")) {
+                        return RepeatStatus.FINISHED;
+                    }
+
+                    Long visitCountPerDay = Long.parseLong(
+                        String.valueOf(redisTemplate.opsForValue().get("VisitCountPerDay")));
+
+                    totalVisitRepository.findById(1L).ifPresentOrElse(
+                        totalVisit -> {
+                            Long count = totalVisit.getCount();
+                            totalVisit.setCount(count + visitCountPerDay);
+                        },
+                        () -> totalVisitRepository.save(new TotalVisit(1L, visitCountPerDay))
+                    );
+
+                    return RepeatStatus.FINISHED;
+                })
+            ).build();
+    }
+
+
     //    @Bean
     public Step stepForCountPerMonth() {
         return stepBuilderFactory.get("stepForCountPerMonth")
@@ -315,53 +321,11 @@ public class BatchConfig {
                             }
                         );
 
-//
-//                    for (CountPerDay countPerDay : all) {
-//                        System.out.println(
-//                            "countPerDay.getBoardCntPerDay() = " + countPerDay.getBoardCntPerDay());
-//
-//                    }
-
-//                    all.stream().forEach(
-//                        countPerDay -> {
-//                            System.out.println("countPerDay = " + countPerDay.getId());
-//                            countPerMonth.addVisitPerMonth(countPerDay);
-//
-//                        }
-//                    );
-
                     countPerMonthRepository.save(countPerMonth);
                     return RepeatStatus.FINISHED;
 
                 })
             ).build();
     }
-//
-//    @Bean
-//    public CompositeItemProcessor compositeProcessor() {
-//        List<ItemProcessor> delegates = new ArrayList<>(2);
-//        delegates.add(new FooProcessor());
-//        delegates.add(new BarProcessor());
-//
-//        CompositeItemProcessor processor = new CompositeItemProcessor();
-//
-//        processor.setDelegates(delegates);
-//
-//        return processor;
-//    }
-
-    //    @Bean
-//    public Step step2() {
-//        return stepBuilderFactory.get("step2").chunk(10).reader(
-//                new ItemReader<String>() {
-//                    @Override
-//                    public String read()
-//                        throws Exception {
-//                        return "3";
-//                    }
-//                }
-//            )
-//            .build();
-//    }
 
 }

@@ -1,7 +1,6 @@
 package Jay.BoardP.controller.dto;
 
 
-import Jay.BoardP.domain.Address;
 import Jay.BoardP.domain.Member;
 import java.sql.Date;
 import javax.validation.constraints.Email;
@@ -9,9 +8,11 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @NoArgsConstructor
 @Getter
+@Setter
 public class MemberFormDto {
 
     private Long id;
@@ -49,12 +50,6 @@ public class MemberFormDto {
 
     private Date birthDate;
 
-//    private Address address;
-
-//    private String city;
-//    private String street;
-//    private String zipCode;
-
 
     public void setMemberForm(Member member) {
         this.userId = member.getUserId();
@@ -63,7 +58,6 @@ public class MemberFormDto {
         this.email = member.getEmail();
         this.phone = member.getPhoneNumber();
         this.birthDate = member.getBirthDate();
-//        this.address = member.getAddress();
     }
 
 

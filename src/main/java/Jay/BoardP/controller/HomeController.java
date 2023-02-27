@@ -2,6 +2,7 @@ package Jay.BoardP.controller;
 
 
 import Jay.BoardP.domain.Member;
+import Jay.BoardP.repository.SpringDataTotalVisitRepository;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 public class HomeController {
 
     private final RedisTemplate redisTemplate;
+
+    private final SpringDataTotalVisitRepository repository;
 
 
     //    @GetMapping("/loginHome")
@@ -42,11 +45,10 @@ public class HomeController {
     }
 
     @GetMapping("/")
-    public String homeLoginV2(HttpServletRequest request, Model model) {
+    public String homeLoginV2(HttpServletRequest request,
+        Model model) {
 
         String ipAddress = getIpAddress(request);
-
-//        makeUpdateCount("VisitCountPerDay");
 
         // 첫요청일시
         if (isFirstRequest(ipAddress)) {
@@ -55,23 +57,9 @@ public class HomeController {
         }
 
 
+        model.addAttribute("visitPerDay", redisTemplate.opsForValue().get("VisitCountPerDay"));
+        model.addAttribute("totalVisit", repository.findById(1L).get().getCount());
 
-//        HttpSession session = request.getSession(false);
-//
-//        if (session == null) {
-//            return "homeV2";
-//        }
-//
-//        Member member =(Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
-//
-//        if ( member == null ) {
-//            return "homeV2";
-//        }
-//        model.addAttribute("member", member);
-//        Long visitCount = redisService.getVisitCount();
-//        System.out.println("visitCount = " + visitCount);
-//
-//        model.addAttribute("count", redisService.getVisitCount());
         return "homeV2";
     }
 
@@ -151,3 +139,20 @@ public class HomeController {
 
 
 }
+
+
+//
+//        if (session == null) {
+//            return "homeV2";
+//        }
+//
+//        Member member =(Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
+//
+//        if ( member == null ) {
+//            return "homeV2";
+//        }
+//        model.addAttribute("member", member);
+//        Long visitCount = redisService.getVisitCount();
+//        System.out.println("visitCount = " + visitCount);
+//
+//        model.addAttribute("count", redisService.getVisitCount());

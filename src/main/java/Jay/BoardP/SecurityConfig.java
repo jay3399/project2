@@ -31,6 +31,7 @@ public class SecurityConfig {
              .permitAll()
 //           .antMatchers("/**").permitAll()
              .antMatchers("/admin/**").hasRole("ADMIN")
+             .antMatchers("/boards/**").hasAnyRole("USER" , "ADMIN" , "PENALTY")
              .anyRequest().authenticated()
              .and()
              .formLogin().loginPage("/login")

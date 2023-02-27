@@ -34,6 +34,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -89,7 +90,6 @@ public class BoardController {
         @PageableDefault(page = 0, size = 10, sort = "id", direction = Direction.DESC) Pageable pageable,
         @PathVariable("categoryCode") String categoryCode, Model model,
         @ModelAttribute("boardSearch") BoardSearch boardSearch) {
-
 
         Page<BoardListDto> boardListV2;
 
@@ -151,7 +151,6 @@ public class BoardController {
 
         List<FileDto> boardsFiles = boardService.findBoardsFiles(boardId);
 
-
         for (FileDto boardsFile : boardsFiles) {
             System.out.println("boardsFile = " + boardsFile.getFileType());
             System.out.println(
@@ -194,25 +193,24 @@ public class BoardController {
             return "board/boardForm";
         }
 
+
         // 권한 인증 , 오직 어드민만 공지사항작성가능
         // 프론트단에서 막아놔도 , 스크립트상으로 접근가능 -> 컨트롤러에서 한번더 검증
         if (isNotice(boardAddForm, user)) {
             return "redirect:/boards/post";
         }
 
-        String ipAddress = getIpAddress(req);
 
-        String categoryCode = boardAddForm.getCategoryCode();
+
+        String ipAddress = getIpAddress(req);
 
         BoardPostDto boardPostDto = boardAddForm.createBoardPostDto(user.getNickname(), ipAddress);
 
-        Long boardId = boardService.addBoardV2(user.getId(
+        Long boardId = boardService.addBoardV2(user.getId(), boardPostDto);
 
-        ), boardPostDto);
 
-        String key = "boardPerDay";
 
-        makeUpdateCount(key);
+        makeUpdateCount("boardPerDay");
 
         redirectAttributes.addAttribute("boardId", boardId);
 
@@ -474,9 +472,6 @@ public class BoardController {
 //        return "board/boardList";
 //    }
 //
-
-
-
 
 
 }

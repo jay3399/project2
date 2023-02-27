@@ -76,10 +76,6 @@ public class Member extends TimeEntity {
     @Formula("select count(*) from BOARD_COMMENT b where b.member_id = member_id")
     private Long countOfComments;
 
-
-//    @Embedded
-//    private Address address;
-
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -91,7 +87,6 @@ public class Member extends TimeEntity {
         this.birthDate = dto.getBirthDate();
         this.phoneNumber = dto.getPhone();
         this.email = dto.getEmail();
-//        this.address = dto.getAddress();
         this.role = Role.USER;
     }
 
@@ -102,14 +97,13 @@ public class Member extends TimeEntity {
     }
 
     @Builder
-    public Member(String userId , String password , String nickname , Date birthDate , String phoneNumber , String email , Address address ) {
+    public Member(String userId , String password , String nickname , Date birthDate , String phoneNumber , String email) {
         this.userId = userId;
         this.password = password;
         this.nickname = nickname;
         this.birthDate = birthDate;
         this.phoneNumber =phoneNumber;
         this.email = email;
-//        this.address = address;
         this.role = Role.USER;
     }
 

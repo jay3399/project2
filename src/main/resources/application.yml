@@ -14,7 +14,7 @@ spring:
     timeout: 6
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
@@ -65,7 +65,7 @@ logging:
   level:
     org.hibernate.sql: debug
     org.hibernate.type: trace
-    org.apache.coyote.http11: debug
+#    org.apache.coyote.http11: debug
 
 file:
   dir: /Users/jay/Downloads/ProjectStore
