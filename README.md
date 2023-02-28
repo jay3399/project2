@@ -21,7 +21,7 @@
 - H2 DataBase , Redis
 - ThymeLeaf
 
-##기능 
+## 기능 
  - 사용자 
    * 로그인 
    * 회원가입
