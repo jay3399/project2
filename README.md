@@ -13,7 +13,7 @@
   * 프로젝트를 진행해가며 , jpa뿐만이아닌 다양한 기술들을 경험해볼수있었고 이런저런 오류를 해결하고 구조를 바꿔가며 유지보수성이 좋은 코드에대한  필요성또한 느꼈습니다 . 그렇기에 앞으로는 특정기술에대한 학습보다는 , 객체지향과  깔끔한 코드를 작성하는 것에대해배워보려합니다.   
 
 ## 개발환경 
-- IntelliJ , Mac 
+- IntelliJ , MacOS 
 - java11 
 - SpringBoot 2.7.6 (Gradle)
 - SpringSecurity  , SpringBatch 
