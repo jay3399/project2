@@ -1,8 +1,16 @@
 package Jay.BoardP.controller;
 
 
+import static org.springframework.util.StringUtils.hasText;
+
+import Jay.BoardP.controller.form.ResetPasswordForm;
 import Jay.BoardP.domain.Member;
 import Jay.BoardP.repository.SpringDataTotalVisitRepository;
+import Jay.BoardP.service.EmailService;
+import Jay.BoardP.service.memberService;
+import java.time.Duration;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -12,8 +20,17 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Slf4j
 @Controller
@@ -23,6 +40,10 @@ public class HomeController {
     private final RedisTemplate redisTemplate;
 
     private final SpringDataTotalVisitRepository repository;
+
+    private final memberService memberService;
+
+    private final EmailService emailService;
 
 
     //    @GetMapping("/loginHome")
@@ -64,8 +85,91 @@ public class HomeController {
     }
 
 
+    @GetMapping("/find/userId")
+    public String findUserIdForm() {
+        return "findUserIdForm";
+    }
+
+    @PostMapping("/find/userId")
+    public String findUserId(@RequestParam String email, RedirectAttributes redirectAttributes) {
+
+        Member member = memberService.findByEmail(email);
+
+        if (member == null) {
+            redirectAttributes.addAttribute("error", true);
+            return "redirect:/find/userId";
+        }
+        redirectAttributes.addAttribute("success", true);
+        emailService.mailCheckForUserId(email, member.getUserId());
+
+        return "redirect:/find/userId";
+    }
+
+
+    @GetMapping("/find/password")
+    public String findPasswordForm() {
+        return "findPasswordForm";
+    }
+
+    @PostMapping("/find/password")
+    public String findPassword(String email, String userId, RedirectAttributes redirectAttributes,
+        Model model) {
+
+
+        if (!hasText(email) || !hasText(userId)) {
+            redirectAttributes.addAttribute("status", true);
+            return "redirect:/findPassword";
+        }
+
+        Member member = memberService.isExistEmailAndUserId(email, userId);
+
+        if (member == null) {
+            redirectAttributes.addAttribute("incorrect", true);
+            return "redirect:/findPassword";
+        }
+
+        emailService.mailCheck(email);
+        model.addAttribute("id", member.getId());
+        model.addAttribute("resetForm", new ResetPasswordForm());
+
+
+        return "resetPasswordForm";
+    }
+
+    @PostMapping("/find/{memberId}/resetPassword")
+    public String resetPassword(@Validated @ModelAttribute ResetPasswordForm form,
+        BindingResult bindingResult, @PathVariable Long memberId) {
+
+        String email = memberService.findOne(memberId).getEmail();
+
+        String code = String.valueOf(redisTemplate.opsForValue().get(email));
+
+        if (!code.equals(form.getCode())) {
+            bindingResult.reject("incorrectCode" , "이메일 인증번호가 일치하지않습니다");
+        }
+
+        if (!form.getEditPassword().equals(form.getCheckEditPassword())) {
+            bindingResult.reject("incorrectPassword", "패스워드가 일치하지않습니다");
+        }
+
+        if (bindingResult.hasErrors()) {
+            return "resetPasswordForm";
+        }
+
+        memberService.editPassword(memberId, form.getEditPassword());
+
+        redisTemplate.delete(email);
+
+        return "redirect:/";
+    }
+
+
+
+
+
 
     private void makeUpdateCount() {
+
         if (!redisTemplate.hasKey("VisitCountPerDay")) {
             ValueOperations valueOperations = redisTemplate.opsForValue();
             valueOperations.set("VisitCountPerDay", 0L);
@@ -119,7 +223,7 @@ public class HomeController {
             ip = req.getHeader("Proxy-Client-IP");
         }
         if (ip == null) {
-            ip = req.getHeader("WL-Proxy-Client-IP"); // 웹로직
+            ip = req.getHeader("WL-Proxy-Client-IP");
         }
         if (ip == null) {
             ip = req.getHeader("HTTP_CLIENT_IP");

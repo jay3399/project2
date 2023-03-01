@@ -2,6 +2,22 @@
 <head>
   <meta charset="UTF-8">
   <title>Title</title>
+  <style>
+  .input-content{
+    width: 488px;
+    height: 400px;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+
+
+  </style>
 </head>
 <body>
 <form th:object="${board}" method="post" th:action enctype="multipart/form-data">

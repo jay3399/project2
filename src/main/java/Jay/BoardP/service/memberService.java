@@ -48,6 +48,18 @@ public class memberService {
     }
 
 
+    public Member isExistEmailAndUserId(String email , String userId) {
+
+        Member memberByEmail = memberRepository.findMemberByEmailAndUserId(email, userId);
+
+//        if (memberByEmail != null) {
+//            return true;
+//        }
+
+        return memberByEmail;
+    }
+
+
     @Transactional
     public void editPassword(Long memberId, String password) {
         Member member = memberRepository.findMember(memberId);
@@ -82,4 +94,11 @@ public class memberService {
     }
 
 
+    @Transactional
+    public void releaseHuman(Long id) {
+
+        Member member = memberRepository.findMember(id);
+        member.setRole(Role.USER);
+
+    }
 }

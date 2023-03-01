@@ -113,9 +113,8 @@ public class AdminController {
         return "redirect:/admin/boards";
     }
 
+
     // 위는 트렌젝션을 안해도 상관이 없는데 , 왜 아래는 해야할까 > ??? ????? ??????????@@@@
-
-
     @GetMapping("/deleteAll")
     @Transactional
     public String deleteBoardByCondition() {

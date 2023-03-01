@@ -208,8 +208,6 @@ public class BoardController {
 
         Long boardId = boardService.addBoardV2(user.getId(), boardPostDto);
 
-
-
         makeUpdateCount("boardPerDay");
 
         redirectAttributes.addAttribute("boardId", boardId);

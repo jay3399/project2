@@ -4,6 +4,7 @@ package Jay.BoardP.controller;
 import static org.springframework.util.StringUtils.hasText;
 
 import Jay.BoardP.controller.dto.MemberFormDto;
+import Jay.BoardP.controller.dto.User;
 import Jay.BoardP.domain.Member;
 import Jay.BoardP.service.EmailService;
 import Jay.BoardP.service.memberService;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -45,14 +47,13 @@ public class MemberController {
 
 
     @PostMapping("/signUp")
-    public String addMember(@Validated@ModelAttribute("memberFormDto") MemberFormDto memberFormDto,
+    public String addMember(@Validated @ModelAttribute("memberFormDto") MemberFormDto memberFormDto,
         BindingResult bindingResult, HttpServletRequest request) {
 
 //        HttpSession session1 = request.getSession();
 //        String code = (String) session1.getAttribute("email");
 
         String code = String.valueOf(redisTemplate.opsForValue().get(memberFormDto.getEmail()));
-
 
         //비밀번호 재확인 검증
         if (!memberFormDto.getPassword().equals(memberFormDto.getCheckPassword())) {
@@ -80,25 +81,25 @@ public class MemberController {
         return "redirect:/";
     }
 
-    @GetMapping("/{id}/release")
-    public String releaseHumanForm(@PathVariable String id) {
+    @GetMapping("/release")
+    public String releaseHumanForm() {
         return "members/validateMember";
     }
 
-    @PostMapping("/{id}/release")
-    public String validateHuman(@PathVariable Long id, @RequestParam String password , RedirectAttributes redirectAttributes) {
+    @PostMapping("/release")
+    public String validateHuman(@RequestParam String password,
+        RedirectAttributes redirectAttributes, @AuthenticationPrincipal User user) {
+//
+//        if (!hasText(password)) {
+//            redirectAttributes.addAttribute("empty", "비밀번호가 비어있습니다");
+//            return "redirect:/members/{id}/validate";
+//        }
 
-        if (!hasText(password)) {
-            redirectAttributes.addAttribute("empty", "비밀번호가 비어있습니다");
-            redirectAttributes.addAttribute("id", id);
+        if (isValidatedHuman(user.getId(), password) || !hasText(password)) {
+            redirectAttributes.addAttribute("mismatch", "비밀번호가 일치하지않습니다");
             return "redirect:/members/{id}/validate";
         }
-
-        if (isValidatedHuman(id, password)) {
-            redirectAttributes.addAttribute("mismatch", "비밀번호가 잘못됐습니다");
-            redirectAttributes.addAttribute("id", id);
-            return "redirect:/members/{id}/validate";
-        }
+        memberService.releaseHuman(user.getId());
 
         return "redirect:/login";
     }
@@ -110,27 +111,18 @@ public class MemberController {
 
     @PostMapping("/signUp/mail")
     @ResponseBody
-    public boolean Mail(String email, HttpServletRequest request) {
+    public boolean Mail(String email) {
 
         boolean isDup = false;
 
         Member byEmail = memberService.findByEmail(email);
 
+        // 이메일 및 , 인증번호 중복방지
         if (byEmail == null && !redisTemplate.hasKey(email)) {
-
-            String code = emailService.mailCheck(email);
-
-            redisTemplate.opsForValue().set(email, code, Duration.ofMinutes(3));
-
-            String.valueOf(redisTemplate.opsForValue().get(email));
-
+            emailService.mailCheck(email);
         } else {
             isDup = true;
         }
-
-//
-//        HttpSession session = request.getSession();
-//        session.setAttribute("email", code);
 
         return isDup;
     }
