@@ -42,6 +42,7 @@ public class MyPageController {
     public String info(@AuthenticationPrincipal User user, Model model) {
         Long id = user.getId();
         Member member = memberservice.findOne(id);
+
         model.addAttribute("member", member);
 
         return "mypage/info";

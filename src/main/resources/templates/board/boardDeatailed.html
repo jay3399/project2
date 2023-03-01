@@ -34,12 +34,6 @@
 
     }
 
-    .contentContainer {
-      width: 500px;
-      height: 350px;
-
-    }
-
   </style>
 
 
@@ -227,7 +221,7 @@
 <form method="post" th:action="@{/boards/{boardId}/delete (boardId=${board.id})}">
   <button type="submit">삭제하기</button>
 </form>
-<form method="get" th:action="@{/boards/{boardId}/edit (boardId=${board.id})}" th:if="${board.nickName}==${nickName}">
+<form method="get" th:action="@{/boards/{boardId}/edit (boardId=${board.id})}">
   <button type="submit">수정하기</button>
 </form>
 

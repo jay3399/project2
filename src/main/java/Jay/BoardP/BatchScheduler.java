@@ -23,14 +23,11 @@ public class BatchScheduler {
     private final JobLauncher jobLauncher;
     private final BatchConfig batchConfig;
 
-
-    /*
-    매일저녁 11시 59분 실행
-     */
-    @Scheduled(cron = "0 59 23 * * *")
+    @Scheduled(cron = "0 */10 * * * *")
     private void runJobPerDay() {
 
         Map<String, JobParameter> parameterMap = new HashMap<>();
+
         parameterMap.put("time", new JobParameter(System.currentTimeMillis()));
         JobParameters jobParameters = new JobParameters(parameterMap);
 
@@ -41,14 +38,10 @@ public class BatchScheduler {
 
             log.error(e.getMessage());
         }
-
-
     }
 
-    /*
-    매월 마지막날 오후 11시 59분 실행
-     */
-    @Scheduled(cron = "0 59 23 L * ?")
+
+    @Scheduled(cron = "0 */59 * * * *")
     private void runJobPerMonth() {
 
         Map<String, JobParameter> parameterMap = new HashMap<>();

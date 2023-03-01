@@ -28,6 +28,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) throws IOException {
 
+        HttpSession session = request.getSession();
 
         String name = authentication.getName();
 
@@ -35,6 +36,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         member.setLoginDate(LocalDateTime.now());
 
+        session.setAttribute("welcome", name + "님 반갑습니다");
 
         makeUpdateCount("signInPerDay");
 
