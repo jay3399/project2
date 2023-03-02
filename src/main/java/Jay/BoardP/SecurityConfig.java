@@ -21,44 +21,40 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-     private final LoginSuccessHandler loginSuccessHandler;
+    private final LoginSuccessHandler loginSuccessHandler;
 
-     @Bean
-     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception{
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception{
 
-         httpSecurity.authorizeRequests()
-             .antMatchers("/members/**", "/login/**", "/css/**", "/images/**", "/js/**", "/")
-             .permitAll()
-//           .antMatchers("/**").permitAll()
-             .antMatchers("/admin/**").hasRole("ADMIN")
-             .antMatchers("/boards/**").hasAnyRole("USER" , "ADMIN" , "PENALTY")
-             .anyRequest().authenticated()
-             .and()
-             .formLogin().loginPage("/login")
-             .usernameParameter("userId")
-             .successHandler(loginSuccessHandler)
-             .loginProcessingUrl("/login")
+        httpSecurity.authorizeRequests()
+            .antMatchers("/members/**", "/login/**", "/css/**", "/images/**", "/js/**", "/" , "/find/**")
+            .permitAll()
+            .antMatchers("/admin/**").hasRole("ADMIN")
+            .antMatchers("/boards/**").hasAnyRole("USER", "ADMIN", "PENALTY")
+            .anyRequest().authenticated()
+            .and()
+            .formLogin().loginPage("/login")
+            .usernameParameter("userId")
+            .successHandler(loginSuccessHandler)
+            .loginProcessingUrl("/login")
 //             .defaultSuccessUrl("/")
-             .failureUrl("/login")
-             .and()
-             .csrf().disable()
-             .sessionManagement()
-             .maximumSessions(1)
-             .maxSessionsPreventsLogin(false)
-             .expiredUrl("/")
-             .sessionRegistry(sessionRegistry());
+            .failureUrl("/login")
+            .and()
+            .csrf().disable()
+            .sessionManagement()
+            .maximumSessions(1)
+            .maxSessionsPreventsLogin(false)
+            .expiredUrl("/")
+            .sessionRegistry(sessionRegistry());
+
+        return httpSecurity.build();
+    }
 
 
-
-
-         return httpSecurity.build();
-   }
-
-
-   @Bean
-   public SessionRegistry sessionRegistry() {
-       return new SessionRegistryImpl();
-   }
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
 
 
     @Bean

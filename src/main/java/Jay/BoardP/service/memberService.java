@@ -21,6 +21,7 @@ public class memberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
+
     @Transactional
     public Long save(MemberFormDto member) {
 
@@ -48,11 +49,23 @@ public class memberService {
     }
 
 
+    public Member isExistEmailAndUserId(String email , String userId) {
+
+        Member memberByEmail = memberRepository.findMemberByEmailAndUserId(email, userId);
+
+//        if (memberByEmail != null) {
+//            return true;
+//        }
+
+        return memberByEmail;
+    }
+
+
     @Transactional
     public void editPassword(Long memberId, String password) {
+        System.out.println("password = " + password);
         Member member = memberRepository.findMember(memberId);
-        member.setPassword(password);
-
+        member.setPassword(passwordEncoder.encode(password));
     }
 
     @Transactional
@@ -82,4 +95,11 @@ public class memberService {
     }
 
 
+    @Transactional
+    public void releaseHuman(Long id) {
+
+        Member member = memberRepository.findMember(id);
+        member.setRole(Role.USER);
+
+    }
 }

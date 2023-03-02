@@ -34,6 +34,12 @@
 
     }
 
+    .contentContainer {
+      width: 500px;
+      height: 350px;
+
+    }
+
   </style>
 
 
@@ -65,8 +71,8 @@
       <p th:text="${board.content}">내용</p>
       <div th:each="imageFile : ${files}" th:if="${imageFile.fileType == T(Jay.BoardP.domain.FileType).IMAGE}">
         <img
-             th:src="@{/imagePath/{imageFile}(imageFile=${imageFile.storedFilename})}"
-             width="200" height="200">
+            th:src="@{/imagePath/{imageFile}(imageFile=${imageFile.storedFilename})}"
+            width="200" height="200">
       </div>
       <div>
         <a th:each="imageFile : ${files}" th:if="${imageFile.fileType == T(Jay.BoardP.domain.FileType).IMAGE}"
@@ -117,7 +123,6 @@
             <br>
             <h6 th:text="${comment.nickName}"></h6>
             <span>
-<!--          <h6 th:text="${comment.nickName}"></h6>-->
           <div th:text="${comment.content}"
                th:onclick="|javascript:createReCommentForm(this , ${board.id} , ${comment.id})|"></div>
           <span th:text="${#temporals.format(comment.createdDate , 'yyyy-MM-dd HH:mm:ss')}"></span>
@@ -135,49 +140,30 @@
           </span>
 
             <div>
-              <!--            <button th:if="${comment.nickName} eq ${nickName}" type="button"-->
-              <!--                    th:onclick="|javascript:deleteCommentV2(${board.id} , ${comment.id})|">삭제-->
-              <!--            </button>-->
-              <!--            <button type="button"-->
-              <!--                    th:onclick="|javascript:likeComment(${board.id} , ${comment.id})|">추천-->
-              <!--            </button>-->
-              <!--            <button type="button"-->
-              <!--                    th:onclick="|javascript:disLikeComment(${board.id} , ${comment.id})|">비추천-->
-              <!--            </button>-->
             </div>
-            <!--          <th:block th:if="${comment.nickName} eq ${nickName}">-->
-            <!--            &lt;!&ndash;            <form&ndash;&gt;-->
-            <!--            &lt;!&ndash;                th:action="@{/comment/{boardId}/{commentId}/delete (commentId=${comment.id} , boardId=${board.id})}"&ndash;&gt;-->
-            <!--            &lt;!&ndash;                method="post">&ndash;&gt;-->
-            <!--            <button type="button" th:onclick="|javascript:deleteComment(${board.id} , ${comment.id})|">삭제</button>-->
-            <!--            &lt;!&ndash;            </form>&ndash;&gt;-->
-            <!--          </th:block>-->
           </div>
           <div th:if="${comment.deleteStatus ==T(Jay.BoardP.domain.DeleteStatus).Y}">
             삭제된댓글입니다.
           </div>
           <th:block th:each="recomment:${comment.child}" th:if="${comment.child != null}">
-            <!--          <div class="card-header">-->
-            <!--          <ul class="list-group">-->
-            <!--            <li class="list-group-item justify-content-between">-->
             <hr class="my-4">
             <div th:if="${recomment.deleteStatus==T(Jay.BoardP.domain.DeleteStatus).N}"
                  style="margin-left: 3%">
               <h6 th:text="${recomment.nickName}"></h6>
-                <div>
-                  <span th:text="${comment.nickName}" class="parent-name"></span>
-                  <span th:text="${recomment.content}" th:onclick="|javascript:createReCommentForm(this , ${board.id} , ${recomment.id})|"></span>
-                </div>
-                <span
-                    th:text="${#temporals.format(recomment.createdDate , 'yyyy-MM-dd HH:mm:ss')}"></span>
-                  | 좋아요 : <span th:text="${recomment.likeNum}"></span> | 싫어요 : <span
-                  th:text="${recomment.disLikeNum}"></span> |
-                    <button type="button" th:if="${recomment.nickName} eq ${nickName}"
-                            th:onclick="|javascript:deleteCommentV2(${board.id} , ${recomment.id})|">삭제</button>
-                      <button type="button"
-                              th:onclick="|javascript:likeComment(${board.id} , ${recomment.id})|">추천</button>
-                  <button type="button"
-                          th:onclick="|javascript:disLikeComment(${board.id} , ${recomment.id})|">비추천</button>
+              <div>
+                <span th:text="${comment.nickName}" class="parent-name"></span>
+                <span th:text="${recomment.content}" th:onclick="|javascript:createReCommentForm(this , ${board.id} , ${recomment.id})|"></span>
+              </div>
+              <span
+                  th:text="${#temporals.format(recomment.createdDate , 'yyyy-MM-dd HH:mm:ss')}"></span>
+              | 좋아요 : <span th:text="${recomment.likeNum}"></span> | 싫어요 : <span
+                th:text="${recomment.disLikeNum}"></span> |
+              <button type="button" th:if="${recomment.nickName} eq ${nickName}"
+                      th:onclick="|javascript:deleteCommentV2(${board.id} , ${recomment.id})|">삭제</button>
+              <button type="button"
+                      th:onclick="|javascript:likeComment(${board.id} , ${recomment.id})|">추천</button>
+              <button type="button"
+                      th:onclick="|javascript:disLikeComment(${board.id} , ${recomment.id})|">비추천</button>
             </div>
             <div th:if="${recomment.deleteStatus ==T(Jay.BoardP.domain.DeleteStatus).Y}">
               삭제된댓글입니다.
@@ -199,9 +185,9 @@
                          <button type="button" th:if="${re2comment.nickName} eq ${nickName}"
                                  th:onclick="|javascript:deleteCommentV2(${board.id} , ${re2comment.id})|">삭제</button>
                          <button type="button"
-                                th:onclick="|javascript:likeComment(${board.id} , ${re2comment.id})|">추천</button>
+                                 th:onclick="|javascript:likeComment(${board.id} , ${re2comment.id})|">추천</button>
                          <button type="button"
-                          th:onclick="|javascript:disLikeComment(${board.id} , ${re2comment.id})|">비추천</button>
+                                 th:onclick="|javascript:disLikeComment(${board.id} , ${re2comment.id})|">비추천</button>
 
 
                       </span>
@@ -221,7 +207,7 @@
 <form method="post" th:action="@{/boards/{boardId}/delete (boardId=${board.id})}">
   <button type="submit">삭제하기</button>
 </form>
-<form method="get" th:action="@{/boards/{boardId}/edit (boardId=${board.id})}">
+<form method="get" th:action="@{/boards/{boardId}/edit (boardId=${board.id})}" th:if="${board.nickName}==${nickName}">
   <button type="submit">수정하기</button>
 </form>
 

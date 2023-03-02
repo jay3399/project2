@@ -5,7 +5,6 @@
   <meta charset="utf-8">
   <link th:href="@{/css/bootstrap.min.css}"
         href="css/bootstrap.min.css" rel="stylesheet">
-
   <style>
     body{
       display: flex;
@@ -71,11 +70,8 @@
       <h2>휴먼회원입니다 ,본인인증 부탁드립니다.</h2>
     </div>
     <div class="col">
-      <button class="w-100 btn btn-secondary btn-lg" type="button"
-              th:onclick="th:"
-
-      >
-          휴먼인증
+      <button th:onclick="|javascript:validate()|" class="w-100 btn btn-secondary btn-lg" type="button">
+        휴먼인증
       </button>
     </div>
     <div class="col">
@@ -87,34 +83,67 @@
     </div>
   </div>
 </div>
-  <div sec:authorize="!isAuthenticated()"class ="container" style="max-width : 600px">
-    <div class="py-5 text-center">
-      <h2>홈화면</h2>
-    </div>
-    <hr class="my-4">
+<div sec:authorize="!isAuthenticated()"class ="container" style="max-width : 600px">
+  <div class="py-5 text-center">
+    <h2>홈화면</h2>
+  </div>
+  <hr class="my-4">
 
-    <div class="row">
-      <div class="col">
-        <button class="w-100 btn btn-secondary btn-lg" type="button"
-                th:onclick="|location.href='@{/members/signUp}'|">
-          회원가입
-        </button>
-      </div>
-      <div class="col">
-        <button class="w-100 btn btn-dark btn-lg"
-                onclick="location.href='items.html'"
-                th:onclick="|location.href='@{/login}'|" type="button">
-          로그인
-        </button>
-      </div>
+  <div class="row">
+    <div class="col">
+      <button class="w-100 btn btn-secondary btn-lg" type="button"
+              th:onclick="|location.href='@{/members/signUp}'|">
+        회원가입
+      </button>
+    </div>
+    <div class="col">
+      <button class="w-100 btn btn-dark btn-lg"
+              onclick="location.href='items.html'"
+              th:onclick="|location.href='@{/login}'|" type="button">
+        로그인
+      </button>
+    </div>
+    <div class="col">
+      <button class="w-100 btn btn-dark btn-lg"
+              onclick="location.href='items.html'"
+              th:onclick="|location.href='@{/find/userId}'|" type="button">
+        아이디찾기
+      </button>
+    </div>
+    <div class="col">
+      <button class="w-100 btn btn-dark btn-lg"
+              onclick="location.href='items.html'"
+              th:onclick="|location.href='@{/find/password}'|" type="button">
+        비밀번호
+      </button>
     </div>
   </div>
-<div>
-<label for="visitPerDay" th:text="일일방문자수"></label><span id="visitPerDay" th:text="${visitPerDay}"></span>
-<br>
-<label for="totalVisit" th:text="전체방문자수"></label><span id="totalVisit" th:text="${totalVisit}"></span>
 </div>
-
+<div>
+  <label for="visitPerDay" th:text="일일방문자수"></label><span id="visitPerDay" th:text="${visitPerDay}"></span>
+  <br>
+  <label for="totalVisit" th:text="전체방문자수"></label><span id="totalVisit" th:text="${totalVisit}"></span>
+</div>
 <!-- /container -->
 </body>
+<script th:inline="javascript">
+
+  function validate() {
+
+    let htmlFormElement = document.createElement("form");
+
+    htmlFormElement.setAttribute("method", "GET");
+    htmlFormElement.setAttribute("action", "/members/release");
+
+    document.body.appendChild(htmlFormElement);
+
+    htmlFormElement.submit();
+  }
+
+
+
+
+
+
+</script>
 </html>
