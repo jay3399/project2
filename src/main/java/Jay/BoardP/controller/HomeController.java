@@ -128,7 +128,6 @@ public class HomeController {
         model.addAttribute("id", member.getId());
         model.addAttribute("resetForm", new ResetPasswordForm());
 
-
         return "resetPasswordForm";
     }
 
@@ -152,10 +151,8 @@ public class HomeController {
             return "resetPasswordForm";
         }
 
-        System.out.println("form = " + form.getEditPassword());
 
         memberService.editPassword(memberId, form.getEditPassword());
-
 
         redisTemplate.delete(email);
 
