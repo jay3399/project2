@@ -30,10 +30,10 @@
      + 이메일인증 비동기처리, 레디스 인증키관리 
      + Validated 이용 컨트롤러단 검증 
    * <a href="https://github.com/jay3399/project2/blob/master/src/main/java/Jay/BoardP/controller/BoardController.java">게시판</a> 
-     + 게시글작성, 조회(레디스 캐시적용) ,수정 ,삭제 
+     + 게시글작성, 조회(*레디스 캐시적용) ,수정 ,삭제 
      + 게시글 좋아요 및 신고 
      + 게시글카테고리별 정렬, 검색 및 페이징 , 대표이미지,  공지사항 상단노출
-     + 조회수중복방지 레디스이용 , 조회수카운트 레디스+스케줄러 
+     + 조회수카운트및 최적화 및  중복방지 ( * 레디스&스케줄러 적용 ) 
      + 경고회원은 게시글작성및 댓글작성 불가능 
      + <a href="https://github.com/jay3399/project2/blob/master/src/main/java/Jay/BoardP/controller/CommentController.java">댓글 및 대댓글 작성 및 삭제</a> 
    * <a href="https://github.com/jay3399/project2/blob/master/src/main/java/Jay/BoardP/controller/MyPageController.java">마이페이지</a>
